@@ -1,0 +1,23 @@
+html, body {
+	padding: 0;
+	margin: 0;
+  }
+
+div#controls {
+	position: fixed;
+	right: 1em;	
+	top: 1em;
+}
+
+
+div#status {
+	position: fixed;
+	right: 1em;
+	bottom: 1em;
+}
+
+div.hover-panel {
+	background: #FFFFFF99;
+	border-radius: 5px;
+	padding: 4px;
+}
