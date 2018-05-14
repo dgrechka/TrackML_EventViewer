@@ -1,7 +1,7 @@
 <!doctype html>
 <head>
   <meta charset="utf-8">
-  <title>Hits view</title>
+  <title>TrackML event explorer</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/92/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.4.0/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>  
@@ -14,11 +14,14 @@
 <body>
   <div id="container"></div>
   <div id='controls' class="hover-panel">    
-    <input type='checkbox' data-bind='checked: Autorotate'>Autorotate</div>
+    <p><input type='checkbox' data-bind='checked: Autorotate'/>Autorotate</p>    
+    <p>Particle idx to show (0 = noise):<br/><input data-bind='textInput: FilterParticleIdx'/></p>    
   </div>
   <div id='status' class="hover-panel">
-    <h3>event000001000</h3>
-    <p>Overall hits: <span data-bind="text: HitsCount"></span></p>    
+    <h3>event 000001000</h3>
+    <p>Overall particles: <span data-bind="text: ParticlesCount"></span></p>
+    <p>Overall hits: <span data-bind="text: HitsCount"></span></p>
+    <p>Shown hits: <span data-bind="text: ShownHits().length"></span></p>
   </div>
   <script>
       var vm = new ViewModel();            
@@ -28,18 +31,36 @@
       run();
 
       vm.Autorotate(true);
-
+      
       Papa.parse("event000001000-hits.csv", {
 	    download: true,
 	    complete: function(results) {
+          //hit_id,x,y,z,volume_id,layer_id,module_id
           var N = results.data.length - 1;          
           var points = [];
+          var hitMap = {};
           for(var i=0;i<N;i++) {
-              var row = results.data[i+1];   
+              var row = results.data[i+1];
               points.push(new THREE.Vector3(parseFloat(row[1]),parseFloat(row[2]),parseFloat(row[3])));                       	            
+              hitMap[parseInt(row[0])] = i;
             }	
           vm.Hits(points);          
+          vm.HitsMap(hitMap);
 	        }
+      });
+
+      Papa.parse("event000001000-truth.csv", {
+	    download: true,
+	    complete: function(results) {
+        //hit_id,particle_id,tx,ty,tz,tpx,tpy,tpz,weight
+        var N = results.data.length - 1;
+        var truths = [];
+        for(var i=0;i<N;i++) {
+          var row = results.data[i+1];
+          truths.push(new Truth(parseInt(row[0]),parseInt(row[1])));
+        }
+        vm.Truths(truths);
+      }
       });
   </script>
 </body>
