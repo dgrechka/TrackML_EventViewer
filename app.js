@@ -47,20 +47,16 @@ pointLight.position.z = 3000;
 // add to the scene
 app.scene.add(pointLight);
 
-var axesHelper = new THREE.AxesHelper(1000);
-app.scene.add( axesHelper );
 
 // Start the renderer.
 app.renderer.setSize(WIDTH, HEIGHT);
 
+var axesHelper = new THREE.AxesHelper(1000);
+app.scene.add( axesHelper );
+
 // Attach the renderer-supplied
 // DOM element.
 container.appendChild(app.renderer.domElement);
-
-
-    
-
-
 
 // mean 	60470.00000 	-1.769455 	4.751039 	-2.315056 	10.921564 	5.918389 	371.969117
 // std 	34912.22644 	305.715118 	305.173096 	1061.912476 	3.365705 	3.407428 	529.032206

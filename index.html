@@ -15,12 +15,17 @@
   <div id="container"></div>
   <div id='controls' class="hover-panel">    
     <p><input type='checkbox' data-bind='checked: Autorotate'/>Autorotate</p>    
-    <p>Particle idx to show (0 = noise):<br/><input data-bind='textInput: FilterParticleIdx'/></p>    
+    <hr>
+    <p><input type="checkbox" data-bind="checked: ShowHits"/>Show hits</p>
+    <p><input type="checkbox" data-bind="checked: ShowOrigins"/>Show particle origins</p>
+    <p>Particle idx to show (0 = noise):<br/><input data-bind='textInput: FilterParticleIdx'/></p>
+    <p>Velocity len multiplier:<input data-bind="textInput: VelocityLenMultiplier"/></p>
+    
   </div>
   <div id='status' class="hover-panel">
     <h3>event 000001000</h3>
     <p>Overall particles: <span data-bind="text: ParticlesCount"></span></p>
-    <p>Overall hits: <span data-bind="text: HitsCount"></span></p>
+    <p>Overall hits: <span data-bind="text: HitsCount"></span></p>    
     <p>Shown hits: <span data-bind="text: ShownHits().length"></span></p>
   </div>
   <script>
@@ -28,9 +33,15 @@
 
       init();
       ko.applyBindings(vm);
-      run();
 
       vm.Autorotate(true);
+      vm.ShowHits(true);
+      vm.ShowOrigins(false);
+      vm.VelocityLenMultiplier(1.0);
+
+      run();
+
+      
       
       Papa.parse("event000001000-hits.csv", {
 	    download: true,
@@ -60,6 +71,35 @@
           truths.push(new Truth(parseInt(row[0]),parseInt(row[1])));
         }
         vm.Truths(truths);
+      }
+      });
+
+      Papa.parse("event000001000-particles.csv", {
+	    download: true,
+	    complete: function(results) {
+        // particle_id,vx,vy,vz,px,py,pz,q,nhits
+        var N = results.data.length - 1;
+        var particles = [];
+        var map = {};
+        for(var i=0;i<N;i++) {
+          var row = results.data[i+1];
+          var particle_id = parseInt(row[0]);
+          var particle = new Particle(
+            particle_id,
+            parseFloat(row[1]),
+            parseFloat(row[2]),
+            parseFloat(row[3]),
+            parseFloat(row[4]),
+            parseFloat(row[5]),
+            parseFloat(row[6]),
+            parseInt(row[7]),
+            parseInt(row[8])
+          );
+          map[particle_id] = particle;
+          particles.push(particle);
+        }
+        vm.ParticleMap(map);
+        vm.Particles(particles);
       }
       });
   </script>
