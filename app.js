@@ -11,8 +11,8 @@ app.scene = new THREE.Scene();
     // Set some camera attributes.
     const VIEW_ANGLE = 45;
     const ASPECT = WIDTH / HEIGHT;
-    const NEAR = 1;
-    const FAR = 30000;
+    const NEAR = 1e-2;
+    const FAR = 20000;
 
     // Get the DOM element to attach to
     const container = document.getElementById('container');

@@ -39,7 +39,8 @@ function ViewModel(scene) {
 
 	var dots = undefined;
 
-	var origins = undefined;
+	var originsPos = undefined;
+	var originsNeg = undefined;
 
 	this.ShownHits = ko.pureComputed(function() {
 		if(!that.ShowHits())
@@ -89,32 +90,34 @@ function ViewModel(scene) {
 
 	this.ShownOrigins.subscribe(function(value) {
 		var N = 0;
-		if(origins) {
-			N = origins.length;
-			for( var i=0;i<N;i++) {
-				var origin = origins[i];
-				app.scene.remove(origin);				
-			}
-		}
+		if(originsPos)
+			app.scene.remove(originsPos);				
+		if(originsNeg)
+			app.scene.remove(originsNeg);
 		N = value.length;
 		origins = [];
-		var mult = parseInt(that.VelocityLenMultiplier());
+		var mult = parseFloat(that.VelocityLenMultiplier());
+
+		var geometryPos = new THREE.Geometry();	
+		var geometryNeg = new THREE.Geometry();
+
 		for(var i=0;i<N;i++) {
 			var particle = value[i];
-			var dir = particle.v.clone();
-			//normalize the direction vector (convert to vector of length 1)
-			dir.normalize();
 			var origin = particle.p;
-			var length = particle.v.length()*mult;
 			var hex;
+			var sndVertex = origin.clone();			
+			sndVertex.addScaledVector(particle.v,mult);
 			if(particle.q>0)
-				hex=0xFF0000;
+				geometryPos.vertices.push(origin,sndVertex);			
 			else
-				hex=0x0000FF;
-			var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex);
-			app.scene.add(arrowHelper);
-			origins.push(arrowHelper);
+				geometryNeg.vertices.push(origin,sndVertex);			
 		}
+		var materialPos = new THREE.LineBasicMaterial({color: 0xff0000});
+		originsPos = new THREE.LineSegments( geometryPos, materialPos );
+		app.scene.add(originsPos);
+		var materialNeg = new THREE.LineBasicMaterial({color: 0x0000ff});
+		originsNeg = new THREE.LineSegments( geometryNeg, materialNeg );
+		app.scene.add(originsNeg);
 	});
 
 	this.Autorotate.subscribe(function(value) {
