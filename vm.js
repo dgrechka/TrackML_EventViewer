@@ -1,6 +1,9 @@
-function Truth(hit_id,particle_id) {
+function Truth(hit_id,particle_id,tx,ty,tz,tpx,tpy,tpz,weight) {
 	this.hit_id = hit_id;
 	this.particle_id = particle_id;
+	this.p = new THREE.Vector3(tx,ty,tz);
+	this.m = new THREE.Vector3(tpx,tpy,tpz);
+	this.weight = weight;
 }
 
 function Particle(particle_id,vx,vy,vz,px,py,pz,q,nhits) {
