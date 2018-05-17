@@ -16,4 +16,4 @@ Advantages (compared to official tool):
 Coming soon:
 
 * particle trajectory calculated from initial parameters (e.g. magnetic field vector, initial particle position, initial particle velocity, particle charge).
-This will help to cross check the physics parameters fittering.
+This will help to cross check the single particle parameters fitting.
