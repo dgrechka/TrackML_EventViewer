@@ -18,8 +18,12 @@
     <hr>
     <p><input type="checkbox" data-bind="checked: ShowHits"/>Show hits</p>
     <p><input type="checkbox" data-bind="checked: ShowOrigins"/>Show particle origin vectors<br/>blue - negative particle sharge<br/> red - positive particel charge</p>    
-    <p>Particle idx to show (0 = noise):<br/><input data-bind='textInput: FilterParticleIdx'/></p>
-    <p>Velocity len multiplier:<input data-bind="textInput: VelocityLenMultiplier"/></p>
+    <hr>
+    <h3>Filter</h3>
+    <p>Particle idx to show (0 = noise): <input data-bind='textInput: attemptedIdx'/></p>
+    <p>Particle ID to show (0 = noise): <input data-bind='textInput: attemptedId'/></p>
+    <hr>
+    <p>Momentum len multiplier:<input data-bind="textInput: VelocityLenMultiplier"/></p>
     
   </div>
   <div id='status' class="hover-panel">
@@ -89,8 +93,15 @@
 	    complete: function(results) {
         // particle_id,vx,vy,vz,px,py,pz,q,nhits
         var N = results.data.length - 1;
-        var particles = [];
-        var map = {};
+        var particles = [];        
+        var objectMap = {};
+        var idxToIDMap = [];
+        var idToIDXMap = {};
+
+        //dealing with noise
+        idxToIDMap[0] = 0;
+        idToIDXMap[0] = 0;
+
         for(var i=0;i<N;i++) {
           var row = results.data[i+1];
           var particle_id = parseInt(row[0]);
@@ -105,10 +116,14 @@
             parseInt(row[7]),
             parseInt(row[8])
           );
-          map[particle_id] = particle;
+          objectMap[particle_id] = particle;
           particles.push(particle);
+          idToIDXMap[particle_id] = i+1;
+          idxToIDMap[i+1] = particle_id;
         }
-        vm.ParticleMap(map);
+        vm.ParticleMap(objectMap);
+        vm.ParticleIdxToID(idxToIDMap);
+        vm.ParticleIDtoIDX(idToIDXMap);
         vm.Particles(particles);
       }
       });

@@ -21,14 +21,58 @@ function ViewModel(scene) {
 		
 	this.VelocityLenMultiplier = ko.observable(1);
 
-	this.FilterParticleIdx = ko.observable("");	
+	this.FilterParticleIdx = ko.observable("");
+
+	var that = this;
+
+	this.attemptedIdx = ko.pureComputed({
+		read: function() {
+			return that.FilterParticleIdx();
+		},
+		write: function(value) {
+			if(value.length==0) {
+				that.FilterParticleIdx("");
+			}
+			else {
+				var parsed = parseInt(value);
+				if(!isNaN(parsed)) {
+					if((parsed>=0) && (parsed < that.Particles().length))
+						that.FilterParticleIdx(parsed.toString());
+				}
+			}
+		}
+	});
+
+	this.attemptedId =ko.pureComputed({
+		read: function() {
+			var map = that.ParticleIdxToID();
+			var idx = that.FilterParticleIdx();
+			if(idx.length==0)
+				return "";
+			else {
+				var id = parseInt(idx);
+				return map[id].toString();
+			}
+		},
+		write: function(value) {
+			var map = that.ParticleIDtoIDX();
+			if(value.length === 0){
+				that.FilterParticleIdx("");
+				
+			}
+			else
+			{
+				var parsed = parseInt(value);
+				if(!isNaN(parsed)) {
+					var idx = map[parsed];
+					that.FilterParticleIdx(idx.toString());
+				}
+			}
+		}
+	});
 
 	this.Truths = ko.observable([]);
 	this.Particles = ko.observable([]);
-
-	this.AvailableParticleIDs = ko.pureComputed(function() {		
-		return Array.from(new Set(that.Truths().map(v => v.particle_id)))
-	});
 
 	this.ShowHits = ko.observable(true);
 	this.ShowOrigins = ko.observable(false);
@@ -37,6 +81,8 @@ function ViewModel(scene) {
 	this.HitsMap = ko.observable({});
 	//particleID -> Particle
 	this.ParticleMap = ko.observable({});
+	this.ParticleIdxToID = ko.observable([]);
+	this.ParticleIDtoIDX = ko.observable({});
 
 	var that = this;
 
@@ -49,7 +95,7 @@ function ViewModel(scene) {
 		if(!that.ShowHits())
 			return [];
 		var hits = that.Hits();
-		var availableParticleIDs = that.AvailableParticleIDs();
+		var availableParticleIDs = that.ParticleIdxToID();
 		var particleIdx = parseInt(that.FilterParticleIdx());
 		if(isNaN(particleIdx) || particleIdx >= availableParticleIDs.length)
 			return hits;
@@ -77,7 +123,7 @@ function ViewModel(scene) {
 	});
 
 	this.ShownOrigins = ko.pureComputed(function() {
-		var availableParticleIDs = that.AvailableParticleIDs();
+		var availableParticleIDs = that.ParticleIdxToID();
 		var idx = that.FilterParticleIdx();
 		var particles = that.Particles();
 		var p_map = that.ParticleMap();
@@ -136,7 +182,7 @@ function ViewModel(scene) {
 	});
 
 	this.ParticlesCount = ko.pureComputed(function() {
-		var particles = that.AvailableParticleIDs();
+		var particles = that.ParticleIdxToID();
 		if(particles.length == 0)
 			return "Loading...";
 		else
