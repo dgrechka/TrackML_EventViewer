@@ -91,6 +91,9 @@ function ViewModel(scene) {
 	var originsPos = undefined;
 	var originsNeg = undefined;
 
+	this.ControlsVisible = ko.observable(true);
+	this.HelixControlsVisible = ko.observable(false);
+
 	this.ShownHits = ko.pureComputed(function() {
 		if(!that.ShowHits())
 			return [];
@@ -187,5 +190,93 @@ function ViewModel(scene) {
 			return "Loading...";
 		else
 			return particles.length;
+	});
+
+	//helix related
+	this.ShowHelix = ko.observable(false);
+	this.helix_x_0 = ko.observable("0.0");
+	this.helix_y_0 = ko.observable("0.0");
+	this.helix_z_0 = ko.observable("0.0");
+	this.helix_px = ko.observable("0.0");
+	this.helix_py = ko.observable("0.0");
+	this.helix_q = ko.observable("0.0");
+	this.helix_alpha = ko.observable("0.0");
+	this.helix_phi_0 = ko.observable("0.0");
+	this.helix_tau = ko.observable("0.0");
+	
+	this.fillHelixEnabled = ko.pureComputed(function() {
+		return that.FilterParticleIdx().length>0;
+	});
+
+	this.fillHelix = function() {
+		var idx = parseInt(that.FilterParticleIdx());
+		var id = that.ParticleIdxToID()[idx];
+		var particle = that.ParticleMap()[id];
+		that.helix_x_0(particle.p.x.toString());
+		that.helix_y_0(particle.p.y.toString());
+		that.helix_z_0(particle.p.z.toString());
+		that.helix_px(particle.m.x.toString());
+		that.helix_py(particle.m.y.toString());
+		that.helix_q(particle.q.toString());
+	}
+
+	this.helix_xy_of_z = ko.pureComputed(function() {
+		var x_0 = parseFloat(that.helix_x_0());
+		var y_0 = parseFloat(that.helix_y_0());
+		var z_0 = parseFloat(that.helix_z_0());
+		var alpha = parseFloat(that.helix_alpha());
+		var tau = parseFloat(that.helix_tau());
+		var px = parseFloat(that.helix_px());
+		var py = parseFloat(that.helix_py());
+		var phi_0 = parseFloat(that.helix_phi_0());
+		var q = parseFloat(that.helix_q());
+
+		var p_t = Math.sqrt(px*px+py*py);
+		
+		var rho = alpha*p_t/q;
+
+		var phi = function(z) {return (z_0 - z)/(rho*tau)}		
+
+		return function(z) {
+			var phi_at_z = phi(z)
+			var x = x_0 + rho*(Math.cos(phi_0) - Math.cos(phi_0 + phi_at_z))
+			var y = y_0 + rho*(Math.sin(phi_0) - Math.sin(phi_0 + phi_at_z))
+			return [x, y];
+		}
+	});
+
+	this.helixVerticies = ko.pureComputed(function() {
+		var helix_func = that.helix_xy_of_z();
+		var enabled = that.ShowHelix();
+		if(!enabled)
+			return [];
+		else
+			{
+				var vertices = [];
+				for(var i =0;i<6000;i++) {
+					var z = -3000+i;
+					var xy = helix_func(z);
+					vertices.push(new THREE.Vector3(xy[0],xy[1],z));
+				}
+				return vertices;
+			}
+	});
+
+	var helix = undefined;
+
+	this.helixVerticies.subscribe(function(value) {
+		if(helix)
+			app.scene.remove(helix);
+		var vertices = that.helixVerticies();
+
+		var material = new THREE.LineBasicMaterial({
+			color: 0xffff00
+		});
+		
+		var geometry = new THREE.Geometry();
+		geometry.vertices = vertices;
+		
+		helix = new THREE.Line( geometry, material );
+		app.scene.add( helix );
 	});
 }

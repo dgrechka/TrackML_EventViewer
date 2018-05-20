@@ -16,6 +16,12 @@ div#status {
 	bottom: 1em;
 }
 
+div#helix {
+	position: fixed;
+	left: 1em;
+	bottom: 1em;
+}
+
 div.hover-panel {
 	background: #FFFFFF99;
 	border-radius: 5px;

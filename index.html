@@ -13,7 +13,9 @@
 </head>
 <body>
   <div id="container"></div>
-  <div id='controls' class="hover-panel">    
+  <div id='controls' class="hover-panel">
+    <h3><input type='checkbox' data-bind="checked: ControlsVisible">Controls</h3> 
+    <!-- ko if: ControlsVisible -->
     <p><input type='checkbox' data-bind='checked: Autorotate'/>Autorotate</p>    
     <hr>
     <p><input type="checkbox" data-bind="checked: ShowHits"/>Show hits</p>
@@ -22,9 +24,10 @@
     <h3>Filter</h3>
     <p>Particle idx to show (0 = noise): <input type='number' data-bind='textInput: attemptedIdx'/></p>
     <p>Particle ID to show (0 = noise): <input data-bind='textInput: attemptedId'/></p>
+    <button data-bind="click: fillHelix, enable: fillHelixEnabled">Send params to helix</button>
     <hr>
-    <p>Momentum len multiplier:<input data-bind="textInput: VelocityLenMultiplier"/></p>
-    
+    <p>Momentum visual len multiplier:<input data-bind="textInput: VelocityLenMultiplier"/></p>
+    <!-- /ko -->
   </div>
   <div id='status' class="hover-panel">
     <h3>event 000001000</h3>
@@ -32,6 +35,18 @@
     <p>Overall hits: <span data-bind="text: HitsCount"></span></p>    
     <p>Shown hits: <span data-bind="text: ShownHits().length"></span></p>
   </div>
+  <div id='helix' class="hover-panel">
+    <h3><input type='checkbox' data-bind="checked: HelixControlsVisible">Helix trajectory</h3>
+    <!-- ko if: HelixControlsVisible -->
+    <p><input type="checkbox" data-bind="checked: ShowHelix"/>Show helix</p>
+    <p>Origin (x,y,z):<input size="10" data-bind="textInput: helix_x_0"><input size="10" data-bind="textInput: helix_y_0"><input size="10" data-bind="textInput: helix_z_0"></p>
+    <p>Momentum (x,y):<input size="10" data-bind="textInput: helix_px"><input size="10" data-bind="textInput: helix_py"></p>
+    <p>Charge (Q):<input size="10" data-bind="textInput: helix_q"></p>
+    <p>Alpha:<input size="10" data-bind="textInput: helix_alpha"></p>
+    <p>Phi 0:<input size="10" data-bind="textInput: helix_phi_0"></p>
+    <p>Tau:<input size="10" data-bind="textInput: helix_tau"></p>
+    <!-- /ko -->
+  </div>    
   <script>
       var vm = new ViewModel();            
 
@@ -42,6 +57,10 @@
       vm.ShowHits(true);
       vm.ShowOrigins(true);
       vm.VelocityLenMultiplier(10);
+
+      vm.helix_alpha("1654.0640844");
+      vm.helix_phi_0("17.6553459");
+      vm.helix_tau("0.3756032");
 
       run();
 
