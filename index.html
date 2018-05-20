@@ -20,7 +20,7 @@
     <p><input type="checkbox" data-bind="checked: ShowOrigins"/>Show particle origin vectors<br/>blue - negative particle sharge<br/> red - positive particel charge</p>    
     <hr>
     <h3>Filter</h3>
-    <p>Particle idx to show (0 = noise): <input data-bind='textInput: attemptedIdx'/></p>
+    <p>Particle idx to show (0 = noise): <input type='number' data-bind='textInput: attemptedIdx'/></p>
     <p>Particle ID to show (0 = noise): <input data-bind='textInput: attemptedId'/></p>
     <hr>
     <p>Momentum len multiplier:<input data-bind="textInput: VelocityLenMultiplier"/></p>
@@ -41,7 +41,7 @@
       vm.Autorotate(true);
       vm.ShowHits(true);
       vm.ShowOrigins(true);
-      vm.VelocityLenMultiplier(0.1);
+      vm.VelocityLenMultiplier(10);
 
       run();
 

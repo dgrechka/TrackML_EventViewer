@@ -8,8 +8,8 @@ function Truth(hit_id,particle_id,tx,ty,tz,tpx,tpy,tpz,weight) {
 
 function Particle(particle_id,vx,vy,vz,px,py,pz,q,nhits) {
 	this.particle_id = particle_id;
-	this.p = new THREE.Vector3( px, py, pz );
-	this.v = new THREE.Vector3( vx, vy, vz );
+	this.p = new THREE.Vector3( vx, vy, vz );
+	this.m = new THREE.Vector3( px, py, pz );
 	this.q = q;
 	this.nhits= nhits;
 }
@@ -155,7 +155,7 @@ function ViewModel(scene) {
 			var origin = particle.p;
 			var hex;
 			var sndVertex = origin.clone();			
-			sndVertex.addScaledVector(particle.v,mult);
+			sndVertex.addScaledVector(particle.m,mult);
 			if(particle.q>0)
 				geometryPos.vertices.push(origin,sndVertex);			
 			else
