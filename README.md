@@ -10,10 +10,7 @@ An online tool for 3D viewing of [TrackML challenge](https://www.kaggle.com/c/tr
 
 Advantages (compared to official tool):
 
-* Filtering to show hits and origin of particle (vertex) as a initial velocity vector
-* Viewing particle origins and initial velocity vectors
-
-Coming soon:
-
-* particle trajectory calculated from initial parameters (e.g. magnetic field vector, initial particle position, initial particle velocity, particle charge).
+* Filtering by particle_id or particle index.
+* Viewing particle origins (so called vertex), initial momentum vectors, particle trajectory.
+* particle trajectory calculated from initial parameters (e.g. magnetic field strength, initial particle position, initial particle momentum, particle charge).
 This will help to cross check the single particle parameters fitting.
