@@ -22,6 +22,10 @@ div#helix {
 	bottom: 1em;
 }
 
+span.num_val {
+	margin-right: 1em;
+}
+
 div.hover-panel {
 	background: #FFFFFF99;
 	border-radius: 5px;

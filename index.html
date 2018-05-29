@@ -23,8 +23,8 @@
     <hr>
     <h3>Filter</h3>
     <p>Particle idx to show (0 = noise): <input type='number' data-bind='textInput: attemptedIdx'/></p>
-    <p>Particle ID to show (0 = noise): <input data-bind='textInput: attemptedId'/></p>
-    <button data-bind="click: fillHelix, enable: fillHelixEnabled">Send params to helix</button>
+    <p>Particle ID to show (0 = noise): <input data-bind='textInput: attemptedId'/></p>    
+    <p data-bind="visible: showHelixEnabled"><input type="checkbox" data-bind="checked: ShowHelix"/>Show helix</p>    
     <hr>
     <p>Momentum visual len multiplier:<input data-bind="textInput: VelocityLenMultiplier"/></p>
     <!-- /ko -->
@@ -35,16 +35,17 @@
     <p>Overall hits: <span data-bind="text: HitsCount"></span></p>    
     <p>Shown hits: <span data-bind="text: ShownHits().length"></span></p>
   </div>
-  <div id='helix' class="hover-panel">
-    <h3><input type='checkbox' data-bind="checked: HelixControlsVisible">Helix trajectory</h3>
-    <!-- ko if: HelixControlsVisible -->
-    <p><input type="checkbox" data-bind="checked: ShowHelix"/>Show helix</p>
-    <p>Origin (x,y,z):<input size="10" data-bind="textInput: helix_x_0"><input size="10" data-bind="textInput: helix_y_0"><input size="10" data-bind="textInput: helix_z_0"></p>
-    <p>Momentum (x,y):<input size="10" data-bind="textInput: helix_px"><input size="10" data-bind="textInput: helix_py"></p>
-    <p>Charge (Q):<input size="10" data-bind="textInput: helix_q"></p>
-    <p>Alpha:<input size="10" data-bind="textInput: helix_alpha"></p>
-    <p>Phi 0:<input size="10" data-bind="textInput: helix_phi_0"></p>
-    <p>Tau:<input size="10" data-bind="textInput: helix_tau"></p>
+  <div id='helix' class="hover-panel" data-bind="visible: showHelixEnabled">
+    <h3><input type='checkbox' data-bind="checked: HelixControlsVisible">Helix details</h3>
+    <!-- ko if: HelixControlsVisible -->    
+    <p>Vertex origin (x,y,z):<span class="num_val" data-bind="text: helix_x_0"></span><span class="num_val" data-bind="text: helix_y_0"></span><span data-bind="text: helix_z_0"/></span></p>
+    <p>Vertex momentum (x,y,z):<span class="num_val" data-bind="text: helix_px"></span><span class="num_val" data-bind="text: helix_py"></span><span data-bind="text: helix_pz"/></span></p>
+    <p>Charge (Q):<span size="10" data-bind="text: helix_q"></p>
+    <p>Alpha:<input size="10"  type='number' data-bind="textInput: helix_alpha"></p>    
+    <p>Rho: <span data-bind="text: helix_rho_num"></span></p>
+    <p>Phi_0: <span data-bind="text: helix_phi_0_num"></span></p> 
+    <p>tan λ : <span data-bind="text: helix_tau_num"></span></p>
+    <p>k: <span data-bind="text: helix_k_num"></span></p>
     <!-- /ko -->
   </div>    
   <script>
@@ -56,12 +57,11 @@
       vm.Autorotate(true);
       vm.ShowHits(true);
       vm.ShowOrigins(true);
+      vm.ShowHelix(true);
       vm.VelocityLenMultiplier(10);
 
       vm.helix_alpha("1654.0640844");
-      vm.helix_phi_0("17.6553459");
-      vm.helix_tau("0.3756032");
-
+      
       run();
 
       

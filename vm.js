@@ -36,8 +36,10 @@ function ViewModel(scene) {
 			else {
 				var parsed = parseInt(value);
 				if(!isNaN(parsed)) {
-					if((parsed>=0) && (parsed < that.Particles().length))
+					if((parsed>=0) && (parsed < that.Particles().length)){
 						that.FilterParticleIdx(parsed.toString());
+						that.fillHelix();
+					}
 				}
 			}
 		}
@@ -51,14 +53,13 @@ function ViewModel(scene) {
 				return "";
 			else {
 				var id = parseInt(idx);
-				return map[id].toString();
+				return map[id].toString();				
 			}
 		},
 		write: function(value) {
 			var map = that.ParticleIDtoIDX();
 			if(value.length === 0){
-				that.FilterParticleIdx("");
-				
+				that.FilterParticleIdx("");				
 			}
 			else
 			{
@@ -66,6 +67,7 @@ function ViewModel(scene) {
 				if(!isNaN(parsed)) {
 					var idx = map[parsed];
 					that.FilterParticleIdx(idx.toString());
+					that.fillHelix();
 				}
 			}
 		}
@@ -199,12 +201,44 @@ function ViewModel(scene) {
 	this.helix_z_0 = ko.observable("0.0");
 	this.helix_px = ko.observable("0.0");
 	this.helix_py = ko.observable("0.0");
+	this.helix_pz = ko.observable("0.0");
 	this.helix_q = ko.observable("0.0");
 	this.helix_alpha = ko.observable("0.0");
-	this.helix_phi_0 = ko.observable("0.0");
-	this.helix_tau = ko.observable("0.0");
 	
-	this.fillHelixEnabled = ko.pureComputed(function() {
+	this.helix_pt_num = ko.pureComputed(function() {
+		var px = parseFloat(that.helix_px())
+		var py = parseFloat(that.helix_py())
+		return Math.sqrt(px*px + py*py);
+	});
+
+	this.helix_k_num = ko.pureComputed(function() {
+		var q = parseFloat(that.helix_q());
+		return q/that.helix_pt_num();
+	});
+
+	this.helix_rho_num = ko.pureComputed(function() {
+		return parseFloat(that.helix_alpha())/that.helix_k_num();
+	})
+
+	this.helix_tau_num = ko.pureComputed(function() {
+		var pz = parseFloat(that.helix_pz())
+		//return pz*Math.abs(that.helix_k_num())
+		return pz/that.helix_pt_num();
+	});
+
+	this.helix_phi_0_num = ko.pureComputed(function() {
+		var px = parseFloat(that.helix_px());
+		var py = parseFloat(that.helix_py());
+		var abs_k = Math.abs(that.helix_k_num());
+		var res = Math.asin(-px*abs_k);
+		//dirty hack
+		if(py<0)
+			res-= Math.PI*0.5;
+		
+		return res;
+	});
+
+	this.showHelixEnabled = ko.pureComputed(function() {
 		return that.FilterParticleIdx().length>0;
 	});
 
@@ -217,6 +251,7 @@ function ViewModel(scene) {
 		that.helix_z_0(particle.p.z.toString());
 		that.helix_px(particle.m.x.toString());
 		that.helix_py(particle.m.y.toString());
+		that.helix_pz(particle.m.z.toString());
 		that.helix_q(particle.q.toString());
 	}
 
@@ -225,15 +260,15 @@ function ViewModel(scene) {
 		var y_0 = parseFloat(that.helix_y_0());
 		var z_0 = parseFloat(that.helix_z_0());
 		var alpha = parseFloat(that.helix_alpha());
-		var tau = parseFloat(that.helix_tau());
+		var tau = that.helix_tau_num();
 		var px = parseFloat(that.helix_px());
 		var py = parseFloat(that.helix_py());
-		var phi_0 = parseFloat(that.helix_phi_0());
+		var phi_0 = that.helix_phi_0_num();
 		var q = parseFloat(that.helix_q());
 
 		var p_t = Math.sqrt(px*px+py*py);
 		
-		var rho = alpha*p_t/q;
+		var rho = that.helix_rho_num();
 
 		var phi = function(z) {return (z_0 - z)/(rho*tau)}		
 
@@ -248,7 +283,8 @@ function ViewModel(scene) {
 	this.helixVerticies = ko.pureComputed(function() {
 		var helix_func = that.helix_xy_of_z();
 		var enabled = that.ShowHelix();
-		if(!enabled)
+
+		if(!enabled || !that.showHelixEnabled())
 			return [];
 		else
 			{
@@ -280,3 +316,4 @@ function ViewModel(scene) {
 		app.scene.add( helix );
 	});
 }
+
