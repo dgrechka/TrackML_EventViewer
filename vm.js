@@ -222,20 +222,19 @@ function ViewModel(scene) {
 
 	this.helix_tau_num = ko.pureComputed(function() {
 		var pz = parseFloat(that.helix_pz())
-		//return pz*Math.abs(that.helix_k_num())
-		return pz/that.helix_pt_num();
+		return pz*Math.abs(that.helix_k_num())
+		//return pz/that.helix_pt_num();
 	});
 
 	this.helix_phi_0_num = ko.pureComputed(function() {
 		var px = parseFloat(that.helix_px());
 		var py = parseFloat(that.helix_py());
 		var abs_k = Math.abs(that.helix_k_num());
-		var res = Math.asin(-px*abs_k);
-		//dirty hack
-		if(py<0)
-			res-= Math.PI*0.5;
+		var phi_0 = Math.asin(-px*abs_k);
+		if(py<0) //cos < 0
+			phi_0 = Math.PI - phi_0;
 		
-		return res;
+		return phi_0;
 	});
 
 	this.showHelixEnabled = ko.pureComputed(function() {
